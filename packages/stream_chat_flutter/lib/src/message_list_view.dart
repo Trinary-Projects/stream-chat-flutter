@@ -136,42 +136,43 @@ class MessageDetails {
 /// Modify it to change the widget appearance.
 class MessageListView extends StatefulWidget {
   /// Instantiate a new MessageListView
-  const MessageListView({
-    Key? key,
-    this.showScrollToBottom = true,
-    this.messageBuilder,
-    this.parentMessageBuilder,
-    this.parentMessage,
-    this.threadBuilder,
-    this.onThreadTap,
-    this.dateDividerBuilder,
-    this.scrollPhysics = const ClampingScrollPhysics(),
-    this.initialScrollIndex,
-    this.initialAlignment,
-    this.scrollController,
-    this.itemPositionListener,
-    this.onMessageSwiped,
-    this.highlightInitialMessage = false,
-    this.messageHighlightColor,
-    this.showConnectionStateTile = false,
-    this.headerBuilder,
-    this.footerBuilder,
-    this.loadingBuilder,
-    this.emptyBuilder,
-    this.systemMessageBuilder,
-    this.messageListBuilder,
-    this.errorBuilder,
-    this.messageFilter,
-    this.onMessageTap,
-    this.onSystemMessageTap,
-    this.pinPermissions = const [],
-    this.showFloatingDateDivider = true,
-    this.threadSeparatorBuilder,
-    this.messageListController,
-    this.reverse = true,
-    this.paginationLimit = 20,
-    this.paginationLoadingIndicatorBuilder,
-  }) : super(key: key);
+  const MessageListView(
+      {Key? key,
+      this.showScrollToBottom = true,
+      this.messageBuilder,
+      this.parentMessageBuilder,
+      this.parentMessage,
+      this.threadBuilder,
+      this.onThreadTap,
+      this.dateDividerBuilder,
+      this.scrollPhysics = const ClampingScrollPhysics(),
+      this.initialScrollIndex,
+      this.initialAlignment,
+      this.scrollController,
+      this.itemPositionListener,
+      this.onMessageSwiped,
+      this.highlightInitialMessage = false,
+      this.messageHighlightColor,
+      this.showConnectionStateTile = false,
+      this.headerBuilder,
+      this.footerBuilder,
+      this.loadingBuilder,
+      this.emptyBuilder,
+      this.systemMessageBuilder,
+      this.messageListBuilder,
+      this.errorBuilder,
+      this.messageFilter,
+      this.onMessageTap,
+      this.onSystemMessageTap,
+      this.pinPermissions = const [],
+      this.showFloatingDateDivider = true,
+      this.threadSeparatorBuilder,
+      this.messageListController,
+      this.reverse = true,
+      this.paginationLimit = 20,
+      this.paginationLoadingIndicatorBuilder,
+      this.backgroundImage})
+      : super(key: key);
 
   /// Function used to build a custom message widget
   final MessageBuilder? messageBuilder;
@@ -282,6 +283,9 @@ class MessageListView extends StatefulWidget {
   /// Builder used to build the thread separator in case it's a thread view
   final WidgetBuilder? threadSeparatorBuilder;
 
+  /// List View Background Image Provider
+  final ImageProvider? backgroundImage;
+
   /// A [MessageListController] allows pagination.
   /// Use [ChannelListController.paginateData] pagination.
   final MessageListController? messageListController;
@@ -384,6 +388,13 @@ class _MessageListViewState extends State<MessageListView> {
     messages = data;
     final newMessagesListLength = messages.length;
 
+    final _backgroundImage = widget.backgroundImage ??
+        Image.asset(
+          'assets/images/chat_message_background.png',
+          repeat: ImageRepeat.repeat,
+          width: MediaQuery.of(context).size.width,
+        ).image;
+
     if (_messageListLength != null) {
       if (_bottomPaginationActive || (_inBetweenList && _upToDate)) {
         if (_itemPositionListener.itemPositions.value.isNotEmpty) {
@@ -413,14 +424,7 @@ class _MessageListViewState extends State<MessageListView> {
       height: double.infinity,
       width: double.infinity,
       decoration: BoxDecoration(
-        image: DecorationImage(
-          fit: BoxFit.fitWidth,
-          image: Image.asset(
-            'assets/images/chat_message_background.png',
-            repeat: ImageRepeat.repeat,
-            width: MediaQuery.of(context).size.width,
-          ).image,
-        ),
+        image: DecorationImage(fit: BoxFit.fitWidth, image: _backgroundImage),
       ),
       child: Stack(
         alignment: Alignment.center,
