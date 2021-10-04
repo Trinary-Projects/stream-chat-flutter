@@ -403,213 +403,237 @@ class _MessageListViewState extends State<MessageListView> {
             1 // parent message
         ;
 
-    final child = Stack(
-      alignment: Alignment.center,
-      children: [
-        ConnectionStatusBuilder(
-          statusBuilder: (context, status) {
-            var statusString = '';
-            var showStatus = true;
-            switch (status) {
-              case ConnectionStatus.connected:
-                statusString = context.translations.connectedLabel;
-                showStatus = false;
-                break;
-              case ConnectionStatus.connecting:
-                statusString = context.translations.reconnectingLabel;
-                break;
-              case ConnectionStatus.disconnected:
-                statusString = context.translations.disconnectedLabel;
-                break;
-            }
+    final child = Container(
+      height: double.infinity,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.fitWidth,
+          image: Image.asset(
+            'assets/images/chat_message_background.png',
+            repeat: ImageRepeat.repeat,
+            width: MediaQuery.of(context).size.width,
+          ).image,
+        ),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ConnectionStatusBuilder(
+            statusBuilder: (context, status) {
+              var statusString = '';
+              var showStatus = true;
+              switch (status) {
+                case ConnectionStatus.connected:
+                  statusString = context.translations.connectedLabel;
+                  showStatus = false;
+                  break;
+                case ConnectionStatus.connecting:
+                  statusString = context.translations.reconnectingLabel;
+                  break;
+                case ConnectionStatus.disconnected:
+                  statusString = context.translations.disconnectedLabel;
+                  break;
+              }
 
-            return InfoTile(
-              showMessage: widget.showConnectionStateTile && showStatus,
-              tileAnchor: Alignment.topCenter,
-              childAnchor: Alignment.topCenter,
-              message: statusString,
-              child: LazyLoadScrollView(
-                onPageScrollStart: () {
-                  FocusScope.of(context).unfocus();
-                },
-                onStartOfPage: () async {
-                  _inBetweenList = false;
-                  if (!_upToDate) {
-                    _topPaginationActive = false;
-                    _bottomPaginationActive = true;
-                    return _paginateData(
-                      streamChannel,
-                      QueryDirection.bottom,
-                    );
-                  }
-                },
-                onEndOfPage: () async {
-                  _inBetweenList = false;
-                  _topPaginationActive = true;
-                  _bottomPaginationActive = false;
-                  return _paginateData(
-                    streamChannel,
-                    QueryDirection.top,
-                  );
-                },
-                onInBetweenOfPage: () {
-                  _inBetweenList = true;
-                },
-                child: ScrollablePositionedList.separated(
-                  key: _upToDate
-                      ? null
-                      : ValueKey(initialIndex + initialAlignment),
-                  itemPositionsListener: _itemPositionListener,
-                  initialScrollIndex: initialIndex,
-                  initialAlignment: initialAlignment,
-                  physics: widget.scrollPhysics,
-                  itemScrollController: _scrollController,
-                  reverse: widget.reverse,
-                  addAutomaticKeepAlives: false,
-                  itemCount: itemCount,
-
-                  // Item Count -> 8 (1 parent, 2 header+footer, 2 top+bottom, 3 messages)
-                  // eg:     |Type|         rev(|Index(item)|)     rev(|Index(separator)|)    |Index(item)|    |Index(separator)|
-                  //     ParentMessage  ->        7                                             (count-1)
-                  //        Separator(ThreadSeparator)          ->           6                                      (count-2)
-                  //     Header         ->        6                                             (count-2)
-                  //        Separator(Header -> 8??T -> 0||52)  ->           5                                      (count-3)
-                  //     TopLoader      ->        5                                             (count-3)
-                  //        Separator(0)                        ->           4                                      (count-4)
-                  //     Message        ->        4                                             (count-4)
-                  //        Separator(2||8)                     ->           3                                      (count-5)
-                  //     Message        ->        3                                             (count-5)
-                  //        Separator(2||8)                     ->           2                                      (count-6)
-                  //     Message        ->        2                                             (count-6)
-                  //        Separator(0)                        ->           1                                      (count-7)
-                  //     BottomLoader   ->        1                                             (count-7)
-                  //        Separator(Footer -> 8??30)          ->           0                                      (count-8)
-                  //     Footer         ->        0                                             (count-8)
-
-                  separatorBuilder: (context, i) {
-                    if (i == itemCount - 2) {
-                      if (widget.parentMessage == null) {
-                        return const Offstage();
-                      }
-                      return _buildThreadSeparator();
-                    }
-                    if (i == itemCount - 3) {
-                      if (widget.headerBuilder == null) {
-                        if (_isThreadConversation) return const Offstage();
-                        return const SizedBox(height: 52);
-                      }
-                      return const SizedBox(height: 8);
-                    }
-                    if (i == 0) {
-                      if (widget.footerBuilder == null) {
-                        return const SizedBox(height: 30);
-                      }
-                      return const SizedBox(height: 8);
-                    }
-
-                    if (i == 1 || i == itemCount - 4) return const Offstage();
-
-                    late final Message message, nextMessage;
-                    if (widget.reverse) {
-                      message = messages[i - 1];
-                      nextMessage = messages[i - 2];
-                    } else {
-                      message = messages[i - 2];
-                      nextMessage = messages[i - 1];
-                    }
-                    if (!Jiffy(message.createdAt.toLocal()).isSame(
-                      nextMessage.createdAt.toLocal(),
-                      Units.DAY,
-                    )) {
-                      final divider = widget.dateDividerBuilder != null
-                          ? widget.dateDividerBuilder!(
-                              nextMessage.createdAt.toLocal(),
-                            )
-                          : DateDivider(
-                              dateTime: nextMessage.createdAt.toLocal(),
-                            );
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: divider,
-                      );
-                    }
-                    final timeDiff =
-                        Jiffy(nextMessage.createdAt.toLocal()).diff(
-                      message.createdAt.toLocal(),
-                      Units.MINUTE,
-                    );
-
-                    final isNextUserSame =
-                        message.user!.id == nextMessage.user?.id;
-                    final isThread = message.replyCount! > 0;
-                    final isDeleted = message.isDeleted;
-                    if (timeDiff >= 1 ||
-                        !isNextUserSame ||
-                        isThread ||
-                        isDeleted) {
-                      return const SizedBox(height: 8);
-                    }
-                    return const SizedBox(height: 2);
+              return InfoTile(
+                showMessage: widget.showConnectionStateTile && showStatus,
+                tileAnchor: Alignment.topCenter,
+                childAnchor: Alignment.topCenter,
+                message: statusString,
+                child: LazyLoadScrollView(
+                  onPageScrollStart: () {
+                    FocusScope.of(context).unfocus();
                   },
-                  itemBuilder: (context, i) {
-                    if (i == itemCount - 1) {
-                      if (widget.parentMessage == null) {
-                        return const Offstage();
-                      }
-                      return buildParentMessage(widget.parentMessage!);
-                    }
-
-                    if (i == itemCount - 2) {
-                      return widget.headerBuilder?.call(context) ??
-                          const Offstage();
-                    }
-
-                    if (i == itemCount - 3) {
-                      return _buildLoadingIndicator(
-                        streamChannel!,
-                        QueryDirection.top,
-                      );
-                    }
-
-                    if (i == 1) {
-                      return _buildLoadingIndicator(
-                        streamChannel!,
+                  onStartOfPage: () async {
+                    _inBetweenList = false;
+                    if (!_upToDate) {
+                      _topPaginationActive = false;
+                      _bottomPaginationActive = true;
+                      return _paginateData(
+                        streamChannel,
                         QueryDirection.bottom,
                       );
                     }
-
-                    if (i == 0) {
-                      return widget.footerBuilder?.call(context) ??
-                          const Offstage();
-                    }
-
-                    const bottomMessageIndex = 2; // 1 -> loader // 0 -> footer
-
-                    final message = messages[i - 2];
-                    Widget messageWidget;
-
-                    if (i == bottomMessageIndex) {
-                      messageWidget = _buildBottomMessage(
-                        context,
-                        message,
-                        messages,
-                        streamChannel!,
-                        i - 2,
-                      );
-                    } else {
-                      messageWidget = buildMessage(message, messages, i - 2);
-                    }
-                    return messageWidget;
                   },
+                  onEndOfPage: () async {
+                    _inBetweenList = false;
+                    _topPaginationActive = true;
+                    _bottomPaginationActive = false;
+                    return _paginateData(
+                      streamChannel,
+                      QueryDirection.top,
+                    );
+                  },
+                  onInBetweenOfPage: () {
+                    _inBetweenList = true;
+                  },
+                  child: ScrollablePositionedList.separated(
+                    key: _upToDate
+                        ? null
+                        : ValueKey(initialIndex + initialAlignment),
+                    itemPositionsListener: _itemPositionListener,
+                    initialScrollIndex: initialIndex,
+                    initialAlignment: initialAlignment,
+                    physics: widget.scrollPhysics,
+                    itemScrollController: _scrollController,
+                    reverse: widget.reverse,
+                    addAutomaticKeepAlives: false,
+                    itemCount: itemCount,
+
+                    // Item Count -> 8 (1 parent, 2 header+footer, 2 top+bottom, 3 messages)
+                    // eg:     |Type|         rev(|Index(item)|)     rev(|Index(separator)|)    |Index(item)|    |Index(separator)|
+                    //     ParentMessage  ->        7                                             (count-1)
+                    //        Separator(ThreadSeparator)          ->           6                                      (count-2)
+                    //     Header         ->        6                                             (count-2)
+                    //        Separator(Header -> 8??T -> 0||52)  ->           5                                      (count-3)
+                    //     TopLoader      ->        5                                             (count-3)
+                    //        Separator(0)                        ->           4                                      (count-4)
+                    //     Message        ->        4                                             (count-4)
+                    //        Separator(2||8)                     ->           3                                      (count-5)
+                    //     Message        ->        3                                             (count-5)
+                    //        Separator(2||8)                     ->           2                                      (count-6)
+                    //     Message        ->        2                                             (count-6)
+                    //        Separator(0)                        ->           1                                      (count-7)
+                    //     BottomLoader   ->        1                                             (count-7)
+                    //        Separator(Footer -> 8??30)          ->           0                                      (count-8)
+                    //     Footer         ->        0                                             (count-8)
+
+                    separatorBuilder: (context, i) {
+                      if (i == itemCount - 2) {
+                        if (widget.parentMessage == null) {
+                          return const Offstage();
+                        }
+                        return _buildThreadSeparator();
+                      }
+                      if (i == itemCount - 3) {
+                        if (widget.reverse
+                            ? widget.headerBuilder == null
+                            : widget.footerBuilder == null) {
+                          if (_isThreadConversation) return const Offstage();
+                          return const SizedBox(height: 52);
+                        }
+                        return const SizedBox(height: 8);
+                      }
+                      if (i == 0) {
+                        if (widget.reverse
+                            ? widget.footerBuilder == null
+                            : widget.headerBuilder == null) {
+                          return const SizedBox(height: 30);
+                        }
+                        return const SizedBox(height: 8);
+                      }
+
+                      if (i == 1 || i == itemCount - 4) return const Offstage();
+
+                      late final Message message, nextMessage;
+                      if (widget.reverse) {
+                        message = messages[i - 1];
+                        nextMessage = messages[i - 2];
+                      } else {
+                        message = messages[i - 2];
+                        nextMessage = messages[i - 1];
+                      }
+                      if (!Jiffy(message.createdAt.toLocal()).isSame(
+                        nextMessage.createdAt.toLocal(),
+                        Units.DAY,
+                      )) {
+                        final divider = widget.dateDividerBuilder != null
+                            ? widget.dateDividerBuilder!(
+                                nextMessage.createdAt.toLocal(),
+                              )
+                            : DateDivider(
+                                dateTime: nextMessage.createdAt.toLocal(),
+                              );
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: divider,
+                        );
+                      }
+                      final timeDiff =
+                          Jiffy(nextMessage.createdAt.toLocal()).diff(
+                        message.createdAt.toLocal(),
+                        Units.MINUTE,
+                      );
+
+                      final isNextUserSame =
+                          message.user!.id == nextMessage.user?.id;
+                      final isThread = message.replyCount! > 0;
+                      final isDeleted = message.isDeleted;
+                      if (timeDiff >= 1 ||
+                          !isNextUserSame ||
+                          isThread ||
+                          isDeleted) {
+                        return const SizedBox(height: 8);
+                      }
+                      return const SizedBox(height: 2);
+                    },
+                    itemBuilder: (context, i) {
+                      if (i == itemCount - 1) {
+                        if (widget.parentMessage == null) {
+                          return const Offstage();
+                        }
+                        return buildParentMessage(widget.parentMessage!);
+                      }
+
+                      if (i == itemCount - 2) {
+                        return widget.headerBuilder?.call(context) ??
+                            const Offstage();
+                      }
+
+                      if (i == itemCount - 3) {
+                        return _buildLoadingIndicator(
+                          streamChannel!,
+                          QueryDirection.top,
+                        );
+                      }
+
+                      if (i == 1) {
+                        return _buildLoadingIndicator(
+                          streamChannel!,
+                          QueryDirection.bottom,
+                        );
+                      }
+
+                      if (i == 0) {
+                        if (widget.reverse) {
+                          return widget.footerBuilder?.call(context) ??
+                              const Offstage();
+                        } else {
+                          return widget.headerBuilder?.call(context) ??
+                              const Offstage();
+                        }
+                      }
+
+                      const bottomMessageIndex =
+                          2; // 1 -> loader // 0 -> footer
+
+                      final message = messages[i - 2];
+                      Widget messageWidget;
+
+                      if (i == bottomMessageIndex) {
+                        messageWidget = _buildBottomMessage(
+                          context,
+                          message,
+                          messages,
+                          streamChannel!,
+                          i - 2,
+                        );
+                      } else {
+                        messageWidget = buildMessage(message, messages, i - 2);
+                      }
+                      return messageWidget;
+                    },
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-        if (widget.showScrollToBottom) _buildScrollToBottom(),
-        if (widget.showFloatingDateDivider)
-          _buildFloatingDateDivider(itemCount),
-      ],
+              );
+            },
+          ),
+          if (widget.showScrollToBottom) _buildScrollToBottom(),
+          if (widget.showFloatingDateDivider)
+            _buildFloatingDateDivider(itemCount),
+        ],
+      ),
     );
 
     final backgroundColor = MessageListViewTheme.of(context).backgroundColor;
