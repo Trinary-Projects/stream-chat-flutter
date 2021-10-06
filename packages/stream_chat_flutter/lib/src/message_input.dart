@@ -204,6 +204,10 @@ class MessageInput extends StatefulWidget {
     this.commandButtonBuilder,
     this.customOverlays = const [],
     this.mentionAllAppUsers = false,
+    this.menuButton,
+    this.textFieldBackgroundColor,
+    this.messageInputPadding = const EdgeInsets.fromLTRB(16, 12, 13, 11),
+    this.sendMessage,
   })  : assert(
           initialMessage == null || editMessage == null,
           "Can't provide both `initialMessage` and `editMessage`",
@@ -321,6 +325,13 @@ class MessageInput extends StatefulWidget {
   ///
   /// Defaults to false.
   final bool mentionAllAppUsers;
+  final Widget? menuButton;
+
+  final Color? textFieldBackgroundColor;
+
+  final EdgeInsets messageInputPadding;
+
+  final Function()? sendMessage;
 
   @override
   MessageInputState createState() => MessageInputState();
@@ -516,6 +527,7 @@ class MessageInputState extends State<MessageInput> {
   Flex _buildTextField(BuildContext context) => Flex(
         direction: Axis.horizontal,
         children: <Widget>[
+          if (widget.menuButton != null) widget.menuButton!,
           if (!_commandEnabled &&
               widget.actionsLocation == ActionsLocation.left)
             _buildExpandActionsButton(context),
@@ -595,10 +607,7 @@ class MessageInputState extends State<MessageInput> {
       sendButton = widget.idleSendButton ?? _buildIdleSendButton(context);
     } else {
       sendButton = widget.activeSendButton != null
-          ? InkWell(
-              onTap: sendMessage,
-              child: widget.activeSendButton,
-            )
+          ? InkWell(onTap: widget.sendMessage, child: widget.activeSendButton)
           : _buildSendButton(context);
     }
 
@@ -611,7 +620,7 @@ class MessageInputState extends State<MessageInput> {
   Widget _buildExpandActionsButton(BuildContext context) {
     final channel = StreamChannel.of(context).channel;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: AnimatedCrossFade(
         crossFadeState: _actionsShrunk
             ? CrossFadeState.showFirst
@@ -671,7 +680,7 @@ class MessageInputState extends State<MessageInput> {
             : EdgeInsets.zero);
     return Expanded(
       child: Container(
-        clipBehavior: Clip.hardEdge,
+        clipBehavior: Clip.antiAlias,
         margin: margin,
         decoration: BoxDecoration(
           borderRadius: _messageInputTheme.borderRadius,
@@ -698,7 +707,8 @@ class MessageInputState extends State<MessageInput> {
                     key: const Key('messageInputText'),
                     enabled: _inputEnabled,
                     maxLines: null,
-                    onSubmitted: (_) => sendMessage(),
+                    onSubmitted: (_) =>
+                        widget.sendMessage?.call() ?? sendMessage(),
                     keyboardType: widget.keyboardType,
                     controller: textEditingController,
                     focusNode: _focusNode,
@@ -750,7 +760,7 @@ class MessageInputState extends State<MessageInput> {
           color: Colors.transparent,
         ),
       ),
-      contentPadding: const EdgeInsets.fromLTRB(16, 12, 13, 11),
+      contentPadding: widget.messageInputPadding,
       prefixIcon: _commandEnabled
           ? Row(
               mainAxisSize: MainAxisSize.min,
@@ -1720,7 +1730,7 @@ class MessageInputState extends State<MessageInput> {
   Widget _buildSendButton(BuildContext context) => Padding(
         padding: const EdgeInsets.all(8),
         child: IconButton(
-          onPressed: sendMessage,
+          onPressed: widget.sendMessage ?? sendMessage,
           padding: const EdgeInsets.all(0),
           splashRadius: 24,
           constraints: const BoxConstraints.tightFor(
