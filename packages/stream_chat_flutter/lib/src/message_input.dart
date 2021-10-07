@@ -191,6 +191,7 @@ class MessageInput extends StatefulWidget {
     this.textFieldBackgroundColor,
     this.messageInputPadding = const EdgeInsets.fromLTRB(16, 12, 13, 11),
     this.sendMessage,
+    this.attachments,
   })  : assert(
           initialMessage == null || editMessage == null,
           "Can't provide both `initialMessage` and `editMessage`",
@@ -306,6 +307,8 @@ class MessageInput extends StatefulWidget {
 
   final Function()? sendMessage;
 
+  final Map<String, Attachment>? attachments;
+
   @override
   MessageInputState createState() => MessageInputState();
 
@@ -323,7 +326,7 @@ class MessageInput extends StatefulWidget {
 
 /// State of [MessageInput]
 class MessageInputState extends State<MessageInput> {
-  final _attachments = <String, Attachment>{};
+  late final Map<String, Attachment> _attachments;
   final List<User> _mentionedUsers = [];
 
   final _imagePicker = ImagePicker();
@@ -354,6 +357,7 @@ class MessageInputState extends State<MessageInput> {
   @override
   void initState() {
     super.initState();
+    _attachments = widget.attachments ?? <String, Attachment>{};
     _focusNode = widget.focusNode ?? FocusNode();
     _emojiNames =
         Emoji.all().where((it) => it.name != null).map((e) => e.name!);
