@@ -608,7 +608,13 @@ class MessageInputState extends State<MessageInput> {
     if (_timeOut > 0) {
       sendButton = _CountdownButton(count: _timeOut);
     } else if (!_messageIsPresent && _attachments.isEmpty) {
-      sendButton = widget.idleSendButton ?? _buildIdleSendButton(context);
+      sendButton = InkWell(
+          onTap: () {
+            if (widget.idleSendButton != null) {
+              pickFile(DefaultAttachmentTypes.image, camera: true);
+            }
+          },
+          child: widget.idleSendButton ?? _buildIdleSendButton(context));
     } else {
       sendButton = widget.activeSendButton != null
           ? InkWell(
