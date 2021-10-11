@@ -570,7 +570,9 @@ class MessageInputState extends State<MessageInput> {
     } else if (!_messageIsPresent && _attachments.isEmpty) {
       sendButton = InkWell(
           onTap: () {
-            pickFile(DefaultAttachmentTypes.image, camera: true);
+            if (widget.idleSendButton != null) {
+              pickFile(DefaultAttachmentTypes.image, camera: true);
+            }
           },
           child: widget.idleSendButton ?? _buildIdleSendButton(context));
     } else {
