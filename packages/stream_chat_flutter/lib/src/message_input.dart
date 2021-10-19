@@ -174,6 +174,7 @@ class MessageInput extends StatefulWidget {
     this.preMessageSending,
     this.parentMessage,
     this.editMessage,
+    this.elevation = 8,
     this.maxHeight = 150,
     this.keyboardType = TextInputType.multiline,
     this.disableAttachments = false,
@@ -247,6 +248,9 @@ class MessageInput extends StatefulWidget {
 
   /// Maximum Height for the TextField to grow before it starts scrolling
   final double maxHeight;
+
+  /// Elevation of MessageInput.
+  final double elevation;
 
   /// The keyboard type assigned to the TextField
   final TextInputType keyboardType;
@@ -493,7 +497,7 @@ class MessageInputState extends State<MessageInput> {
     );
     if (widget.editMessage == null) {
       child = Material(
-        elevation: 8,
+        elevation: widget.elevation,
         child: child,
       );
     }
