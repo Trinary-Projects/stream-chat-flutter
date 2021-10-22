@@ -628,10 +628,7 @@ class MessageInputState extends State<MessageInput> {
           : _buildSendButton(context);
     }
 
-    return AnimatedSwitcher(
-      duration: _streamChatTheme.messageInputTheme.sendAnimationDuration!,
-      child: sendButton,
-    );
+    return sendButton;
   }
 
   Widget _buildExpandActionsButton(BuildContext context) {
