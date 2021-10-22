@@ -588,10 +588,7 @@ class MessageInputState extends State<MessageInput> {
           : _buildSendButton(context);
     }
 
-    return AnimatedSwitcher(
-      duration: _streamChatTheme.messageInputTheme.sendAnimationDuration!,
-      child: sendButton,
-    );
+    return sendButton;
   }
 
   Widget _buildExpandActionsButton(BuildContext context) {
@@ -819,7 +816,7 @@ class MessageInputState extends State<MessageInput> {
 
     if (_debounce?.isActive == true) _debounce!.cancel();
     _debounce = Timer(
-      const Duration(milliseconds: 350),
+      Duration.zero,
       () {
         if (!mounted) {
           return;
