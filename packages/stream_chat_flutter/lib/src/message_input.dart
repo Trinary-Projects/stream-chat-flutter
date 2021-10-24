@@ -1964,18 +1964,22 @@ class MessageInputState extends State<MessageInput> {
 
     if (camera) {
       XFile? pickedFile;
-      if (fileType == DefaultAttachmentTypes.image) {
-        pickedFile = await _imagePicker.pickImage(source: ImageSource.camera);
-      } else if (fileType == DefaultAttachmentTypes.video) {
-        pickedFile = await _imagePicker.pickVideo(source: ImageSource.camera);
-      }
-      if (pickedFile != null) {
-        final bytes = await pickedFile.readAsBytes();
-        file = AttachmentFile(
-          size: bytes.length,
-          path: pickedFile.path,
-          bytes: bytes,
-        );
+      try {
+        if (fileType == DefaultAttachmentTypes.image) {
+          pickedFile = await _imagePicker.pickImage(source: ImageSource.camera);
+        } else if (fileType == DefaultAttachmentTypes.video) {
+          pickedFile = await _imagePicker.pickVideo(source: ImageSource.camera);
+        }
+        if (pickedFile != null) {
+          final bytes = await pickedFile.readAsBytes();
+          file = AttachmentFile(
+            size: bytes.length,
+            path: pickedFile.path,
+            bytes: bytes,
+          );
+        }
+      } on Exception {
+        _showErrorAlert('Enable Camera Permission by going in Settings');
       }
     } else {
       late FileType type;
