@@ -708,7 +708,8 @@ class MessageInputState extends State<MessageInput> {
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: _messageInputTheme.borderRadius,
-              color: _messageInputTheme.inputBackgroundColor,
+              color: widget.textFieldBackgroundColor ??
+                  _messageInputTheme.inputBackgroundColor,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
