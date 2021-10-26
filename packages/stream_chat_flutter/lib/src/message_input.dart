@@ -613,12 +613,13 @@ class MessageInputState extends State<MessageInput> {
       sendButton = _CountdownButton(count: _timeOut);
     } else if (!_messageIsPresent && _attachments.isEmpty) {
       sendButton = InkWell(
-          onTap: () {
-            if (widget.idleSendButton != null) {
-              pickFile(DefaultAttachmentTypes.image, camera: true);
-            }
-          },
-          child: widget.idleSendButton ?? _buildIdleSendButton(context));
+        onTap: () {
+          if (widget.idleSendButton != null) {
+            pickFile(DefaultAttachmentTypes.image, camera: true);
+          }
+        },
+        child: widget.idleSendButton ?? _buildIdleSendButton(context),
+      );
     } else {
       sendButton = widget.activeSendButton != null
           ? InkWell(
@@ -869,7 +870,7 @@ class MessageInputState extends State<MessageInput> {
       _checkMentions(value, context);
       _checkEmoji(value, context);
     },
-    const Duration(milliseconds: 350),
+    Duration.zero,
     leading: true,
   );
 
