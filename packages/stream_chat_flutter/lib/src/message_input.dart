@@ -1529,6 +1529,13 @@ class MessageInputState extends State<MessageInput> {
         defaultButton;
   }
 
+  /// Close the attachment modal.
+  void closeAttachmentModal() {
+    setState(() {
+      _openFilePickerSection = false;
+    });
+  }
+
   /// Show the attachment modal, making the user choose where to
   /// pick a media from
   void showAttachmentModal() {
