@@ -1934,6 +1934,8 @@ class ChannelClientState {
       read: newReads,
       pinnedMessages: updatedState.pinnedMessages,
     );
+    //This calculates the unread count for every channel.
+    _computeUnread();
   }
 
   int _sortByCreatedAt(Message a, Message b) =>
