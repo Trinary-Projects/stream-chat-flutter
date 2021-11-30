@@ -687,12 +687,15 @@ class MessageInputState extends State<MessageInput> {
   }
 
   Expanded _buildTextInput(BuildContext context) {
-    final margin = (widget.sendButtonLocation == SendButtonLocation.inside
-            ? const EdgeInsets.only(right: 8)
-            : EdgeInsets.zero) +
-        (widget.actionsLocation != ActionsLocation.left || _commandEnabled
-            ? const EdgeInsets.only(left: 8)
-            : EdgeInsets.zero);
+    final margin = widget.sendButtonLocation == SendButtonLocation.inside
+        ? const EdgeInsets.only(right: 8)
+        : EdgeInsets.zero;
+    // final margin = (widget.sendButtonLocation == SendButtonLocation.inside
+    //         ? const EdgeInsets.only(right: 8)
+    //         : EdgeInsets.zero) +
+    //     (widget.actionsLocation != ActionsLocation.left || _commandEnabled
+    //         ? const EdgeInsets.only(left: 8)
+    //         : EdgeInsets.zero);
     return Expanded(
       child: Container(
         clipBehavior: Clip.antiAlias,
