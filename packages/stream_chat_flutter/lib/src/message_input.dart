@@ -209,7 +209,7 @@ class MessageInput extends StatefulWidget {
     this.textFieldBackgroundColor,
     this.messageInputPadding = const EdgeInsets.fromLTRB(16, 12, 13, 11),
     this.sendMessage,
-    this.attachments,
+    this.shouldKeepFocusAfterMessage,
   })  : assert(
           initialMessage == null || editMessage == null,
           "Can't provide both `initialMessage` and `editMessage`",
@@ -330,15 +330,22 @@ class MessageInput extends StatefulWidget {
   ///
   /// Defaults to false.
   final bool mentionAllAppUsers;
+
+  /// Menu Button to be shown on left of TextInput
   final Widget? menuButton;
 
+  /// Background color of `TextField` input.
   final Color? textFieldBackgroundColor;
 
+  /// Padding around `TextField` input.
   final EdgeInsets messageInputPadding;
 
+  /// Called upon click of send button.
   final Function()? sendMessage;
 
-  final Map<String, Attachment>? attachments;
+  /// Defines if the [MessageInput] loses focuses after a message is sent.
+  /// The default behaviour keeps focus until a command is enabled.
+  final bool? shouldKeepFocusAfterMessage;
 
   @override
   MessageInputState createState() => MessageInputState();
@@ -357,7 +364,7 @@ class MessageInput extends StatefulWidget {
 
 /// State of [MessageInput]
 class MessageInputState extends State<MessageInput> {
-  late final Map<String, Attachment> _attachments;
+  final _attachments = <String, Attachment>{};
   final List<User> _mentionedUsers = [];
 
   final _imagePicker = ImagePicker();
@@ -387,7 +394,6 @@ class MessageInputState extends State<MessageInput> {
   @override
   void initState() {
     super.initState();
-    _attachments = widget.attachments ?? <String, Attachment>{};
     if (widget.editMessage != null || widget.initialMessage != null) {
       _parseExistingMessage(widget.editMessage ?? widget.initialMessage!);
     }
@@ -1192,7 +1198,9 @@ class MessageInputState extends State<MessageInput> {
   }
 
   Widget _buildMentionsOverlayEntry() {
-    if (textEditingController.value.selection.start < 0) {
+    final channel = StreamChannel.of(context).channel;
+    if (textEditingController.value.selection.start < 0 ||
+        channel.state == null) {
       return const Offstage();
     }
 
@@ -1221,7 +1229,7 @@ class MessageInputState extends State<MessageInput> {
       query: query,
       mentionAllAppUsers: widget.mentionAllAppUsers,
       client: StreamChat.of(context).client,
-      channel: StreamChannel.of(context).channel,
+      channel: channel,
       size: Size(renderObject.size.width - 16, 400),
       mentionsTileBuilder: tileBuilder,
       onMentionUserTap: (user) {
@@ -1680,7 +1688,6 @@ class MessageInputState extends State<MessageInput> {
       }
       final res = await FilePicker.platform.pickFiles(
         type: type,
-        withData: true,
       );
       if (res?.files.isNotEmpty == true) {
         file = res!.files.single.toAttachmentFile;
@@ -1799,7 +1806,9 @@ class MessageInputState extends State<MessageInput> {
       return;
     }
 
-    final shouldUnfocus = _commandEnabled;
+    var shouldKeepFocus = widget.shouldKeepFocusAfterMessage;
+
+    shouldKeepFocus ??= !_commandEnabled;
 
     if (_commandEnabled) {
       text = '${'/${_chosenCommand!.name} '}$text';
@@ -1862,8 +1871,10 @@ class MessageInputState extends State<MessageInput> {
         sendingFuture = channel.updateMessage(message);
       }
 
-      if (!shouldUnfocus) {
+      if (shouldKeepFocus) {
         FocusScope.of(context).requestFocus(_focusNode);
+      } else {
+        FocusScope.of(context).unfocus();
       }
 
       final resp = await sendingFuture;
