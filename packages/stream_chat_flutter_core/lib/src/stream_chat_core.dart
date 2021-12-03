@@ -191,14 +191,13 @@ class StreamChatCoreState extends State<StreamChatCore>
     }
   }
 
-  //User needs to be set every time app comes back from background.
-  void _onForeground() async {
+  void _onForeground() {
     if (_disconnectTimer?.isActive == true) {
       _eventSubscription?.cancel();
       _disconnectTimer?.cancel();
     } else if (client.wsConnectionStatus == ConnectionStatus.disconnected &&
         _isConnectionAvailable) {
-      client.state.currentUser = await client.openConnection();
+      client.openConnection();
     }
   }
 
