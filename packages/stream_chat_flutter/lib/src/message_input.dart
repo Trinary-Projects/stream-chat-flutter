@@ -731,6 +731,7 @@ class MessageInputState extends State<MessageInput> {
                   child: TextField(
                     key: const Key('messageInputText'),
                     enabled: _inputEnabled,
+                    readOnly: _attachments.isNotEmpty,
                     maxLines: null,
                     onSubmitted: (_) =>
                         widget.sendMessage?.call() ?? sendMessage(),

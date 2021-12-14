@@ -99,8 +99,10 @@ class StreamChatLocalizationsKo extends GlobalStreamChatLocalizations {
   @override
   String get alsoSendAsDirectMessageLabel => '다이렉트 메시지로도 보냅니다';
 
+  // @override
+  // String get addACommentOrSendLabel => '주석을 추가하거나 보냅니다';
   @override
-  String get addACommentOrSendLabel => '주석을 추가하거나 보냅니다';
+  String get addACommentOrSendLabel => '';
 
   @override
   String get searchGifLabel => 'GIF 검색';

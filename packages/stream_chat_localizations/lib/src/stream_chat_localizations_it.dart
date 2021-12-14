@@ -104,8 +104,10 @@ class StreamChatLocalizationsIt extends GlobalStreamChatLocalizations {
   String get alsoSendAsDirectMessageLabel =>
       'Manda anche come messaggio diretto';
 
+  // @override
+  // String get addACommentOrSendLabel => 'Aggiungi un commento o invia';
   @override
-  String get addACommentOrSendLabel => 'Aggiungi un commento o invia';
+  String get addACommentOrSendLabel => '';
 
   @override
   String get searchGifLabel => 'Cerca una GIF';
