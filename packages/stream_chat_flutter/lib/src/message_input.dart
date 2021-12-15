@@ -702,6 +702,9 @@ class MessageInputState extends State<MessageInput> {
     //     (widget.actionsLocation != ActionsLocation.left || _commandEnabled
     //         ? const EdgeInsets.only(left: 8)
     //         : EdgeInsets.zero);
+    if (_attachments.isNotEmpty && textEditingController.text != '') {
+      textEditingController.clear();
+    }
     return Expanded(
       child: Container(
         clipBehavior: Clip.antiAlias,
