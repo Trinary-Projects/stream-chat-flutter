@@ -1355,6 +1355,7 @@ class MessageInputState extends State<MessageInput> {
                             child: _buildRemoveButton(e),
                           ),
                           onAttachmentTap: () {
+                            if (widget.onAttachmentTap == null) return;
                             widget.onAttachmentTap!(
                               e.file?.path,
                               e.type,
@@ -1378,6 +1379,7 @@ class MessageInputState extends State<MessageInput> {
                     .map<Widget>(
                       (attachment) => GestureDetector(
                         onTap: () {
+                          if (widget.onAttachmentTap == null) return;
                           widget.onAttachmentTap!(
                             attachment.file?.path,
                             attachment.type,
