@@ -79,6 +79,12 @@ typedef ActionButtonBuilder = Widget Function(
   IconButton defaultActionButton,
 );
 
+/// Callback called when attachment widget is tapped
+typedef AttachmentTapCallback = void Function(
+  String? filePath,
+  String? fileType,
+);
+
 /// Location for actions on the [MessageInput]
 enum ActionsLocation {
   /// Align to left
@@ -210,6 +216,7 @@ class MessageInput extends StatefulWidget {
     this.messageInputPadding = const EdgeInsets.fromLTRB(16, 12, 13, 11),
     this.sendMessage,
     this.shouldKeepFocusAfterMessage,
+    this.onAttachmentTap,
   })  : assert(
           initialMessage == null || editMessage == null,
           "Can't provide both `initialMessage` and `editMessage`",
@@ -346,6 +353,9 @@ class MessageInput extends StatefulWidget {
   /// Defines if the [MessageInput] loses focuses after a message is sent.
   /// The default behaviour keeps focus until a command is enabled.
   final bool? shouldKeepFocusAfterMessage;
+
+  /// Callback called when attachment widget is tapped
+  final AttachmentTapCallback? onAttachmentTap;
 
   @override
   MessageInputState createState() => MessageInputState();
@@ -1344,6 +1354,13 @@ class MessageInputState extends State<MessageInput> {
                             padding: const EdgeInsets.all(8),
                             child: _buildRemoveButton(e),
                           ),
+                          onAttachmentTap: () {
+                            if (widget.onAttachmentTap == null) return;
+                            widget.onAttachmentTap!(
+                              e.file?.path,
+                              e.type,
+                            );
+                          },
                         ),
                       ),
                     )
@@ -1360,24 +1377,33 @@ class MessageInputState extends State<MessageInput> {
                 scrollDirection: Axis.horizontal,
                 children: remainingAttachments
                     .map<Widget>(
-                      (attachment) => ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Stack(
-                          children: <Widget>[
-                            AspectRatio(
-                              aspectRatio: 1,
-                              child: SizedBox(
-                                height: 104,
-                                width: 104,
-                                child: _buildAttachment(attachment),
+                      (attachment) => GestureDetector(
+                        onTap: () {
+                          if (widget.onAttachmentTap == null) return;
+                          widget.onAttachmentTap!(
+                            attachment.file?.path,
+                            attachment.type,
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            children: <Widget>[
+                              AspectRatio(
+                                aspectRatio: 1,
+                                child: SizedBox(
+                                  height: 104,
+                                  width: 104,
+                                  child: _buildAttachment(attachment),
+                                ),
                               ),
-                            ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: _buildRemoveButton(attachment),
-                            ),
-                          ],
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: _buildRemoveButton(attachment),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     )
