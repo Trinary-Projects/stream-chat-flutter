@@ -82,6 +82,7 @@ typedef ActionButtonBuilder = Widget Function(
 /// Callback called when attachment widget is tapped
 typedef AttachmentTapCallback = void Function(
   String? filePath,
+  String? assetUrl,
   String? fileType,
 );
 
@@ -1358,6 +1359,7 @@ class MessageInputState extends State<MessageInput> {
                             if (widget.onAttachmentTap == null) return;
                             widget.onAttachmentTap!(
                               e.file?.path,
+                              e.assetUrl,
                               e.type,
                             );
                           },
@@ -1382,6 +1384,7 @@ class MessageInputState extends State<MessageInput> {
                           if (widget.onAttachmentTap == null) return;
                           widget.onAttachmentTap!(
                             attachment.file?.path,
+                            attachment.assetUrl,
                             attachment.type,
                           );
                         },
