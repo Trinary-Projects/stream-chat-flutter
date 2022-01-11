@@ -120,7 +120,7 @@ class VideoAttachment extends AttachmentWidget {
                 ),
               ),
             ),
-            if (attachment.title != null)
+            if (attachment.title != null && attachment.title!.isNotEmpty)
               Material(
                 color: messageTheme.messageBackgroundColor,
                 child: AttachmentTitle(
