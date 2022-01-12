@@ -218,6 +218,7 @@ class MessageInput extends StatefulWidget {
     this.sendMessage,
     this.shouldKeepFocusAfterMessage,
     this.onAttachmentTap,
+    this.maxLength,
   })  : assert(
           initialMessage == null || editMessage == null,
           "Can't provide both `initialMessage` and `editMessage`",
@@ -243,6 +244,9 @@ class MessageInput extends StatefulWidget {
 
   /// Message to start with
   final Message? initialMessage;
+
+  /// Maximum number of characters allowed in the message.
+  final int? maxLength;
 
   /// Function called after sending the message
   final void Function(Message)? onMessageSent;
@@ -740,6 +744,7 @@ class MessageInputState extends State<MessageInput> {
                 LimitedBox(
                   maxHeight: widget.maxHeight,
                   child: TextField(
+                    maxLength: widget.maxLength,
                     key: const Key('messageInputText'),
                     enabled: _inputEnabled,
                     maxLines: null,
@@ -766,6 +771,7 @@ class MessageInputState extends State<MessageInput> {
   InputDecoration _getInputDecoration(BuildContext context) {
     final passedDecoration = _messageInputTheme.inputDecoration;
     return InputDecoration(
+      counterText: '',
       isDense: true,
       hintText: _getHint(context),
       hintStyle: _messageInputTheme.inputTextStyle!.copyWith(
