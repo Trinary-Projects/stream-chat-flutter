@@ -126,6 +126,10 @@ const _kMinMediaPickerSize = 360.0;
 
 const _kDefaultMaxAttachmentSize = 20971520; // 20MB in Bytes
 
+const _kDefaultMaxImageAttachmentSize = 5242880; // 5MB in Bytes
+const _kDefaultMaxVideoAttachmentSize = 16777216; // 16MB in Bytes
+const _kDefaultMaxFileAttachmentSize = 104857600; // 100MB in Bytes
+
 /// Inactive state
 ///
 /// ![screenshot](https://raw.githubusercontent.com/GetStream/stream-chat-flutter/master/packages/stream_chat_flutter/screenshots/message_input.png)
@@ -1174,18 +1178,34 @@ class MessageInputState extends State<MessageInput> {
       bytes: mediaFile.readAsBytesSync(),
     );
 
-    if (file.size! > widget.maxAttachmentSize) {
+    var maxAttachmentSize = _kDefaultMaxAttachmentSize;
+    switch (medium.type) {
+      case AssetType.audio:
+        maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;
+        break;
+      case AssetType.video:
+        maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;
+        break;
+      case AssetType.image:
+        maxAttachmentSize = _kDefaultMaxImageAttachmentSize;
+        break;
+      case AssetType.other:
+        maxAttachmentSize = _kDefaultMaxFileAttachmentSize;
+        break;
+    }
+
+    if (file.size! > maxAttachmentSize) {
       if (medium.type == AssetType.video && file.path != null) {
-        final mediaInfo = await (VideoService.compressVideo(
+        final mediaInfo = await VideoService.compressVideo(
           file.path!,
           frameRate: widget.compressedVideoFrameRate,
           quality: widget.compressedVideoQuality,
-        ) as FutureOr<MediaInfo>);
+        );
 
-        if (mediaInfo.filesize! > widget.maxAttachmentSize) {
+        if (mediaInfo!.filesize! > maxAttachmentSize) {
           _showErrorAlert(
             context.translations.fileTooLargeAfterCompressionError(
-              widget.maxAttachmentSize / (1024 * 1024),
+              maxAttachmentSize / (1024 * 1024),
             ),
           );
           return;
@@ -1198,7 +1218,7 @@ class MessageInputState extends State<MessageInput> {
         );
       } else {
         _showErrorAlert(context.translations.fileTooLargeError(
-          widget.maxAttachmentSize / (1024 * 1024),
+          maxAttachmentSize / (1024 * 1024),
         ));
         return;
       }
@@ -1750,7 +1770,20 @@ class MessageInputState extends State<MessageInput> {
       extraData: extraDataMap,
     );
 
-    if (file.size! > widget.maxAttachmentSize) {
+    var maxAttachmentSize = _kDefaultMaxAttachmentSize;
+    switch (attachmentType) {
+      case 'video':
+        maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;
+        break;
+      case 'image':
+        maxAttachmentSize = _kDefaultMaxImageAttachmentSize;
+        break;
+      case 'file':
+        maxAttachmentSize = _kDefaultMaxFileAttachmentSize;
+        break;
+    }
+
+    if (file.size! > maxAttachmentSize) {
       if (attachmentType == 'video' && file.path != null) {
         final mediaInfo = await (VideoService.compressVideo(
           file.path!,
@@ -1758,10 +1791,10 @@ class MessageInputState extends State<MessageInput> {
           quality: widget.compressedVideoQuality,
         ) as FutureOr<MediaInfo>);
 
-        if (mediaInfo.filesize! > widget.maxAttachmentSize) {
+        if (mediaInfo.filesize! > maxAttachmentSize) {
           _showErrorAlert(
             context.translations.fileTooLargeAfterCompressionError(
-              widget.maxAttachmentSize / (1024 * 1024),
+              maxAttachmentSize / (1024 * 1024),
             ),
           );
           return;
@@ -1774,7 +1807,7 @@ class MessageInputState extends State<MessageInput> {
         );
       } else {
         _showErrorAlert(context.translations.fileTooLargeError(
-          widget.maxAttachmentSize / (1024 * 1024),
+          maxAttachmentSize / (1024 * 1024),
         ));
         return;
       }
