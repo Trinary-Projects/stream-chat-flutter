@@ -218,7 +218,7 @@ class MessageInput extends StatefulWidget {
     this.mentionAllAppUsers = false,
     this.menuButton,
     this.textFieldBackgroundColor,
-    this.messageInputPadding = const EdgeInsets.fromLTRB(16, 12, 13, 11),
+    this.messageInputPadding = const EdgeInsets.fromLTRB(16, 8, 8, 0),
     this.sendMessage,
     this.shouldKeepFocusAfterMessage,
     this.onAttachmentTap,
