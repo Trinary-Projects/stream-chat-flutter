@@ -73,7 +73,7 @@ class UrlAttachment extends StatelessWidget {
                         child: Text(
                           hostDisplayName,
                           style: chatThemeData.textTheme.bodyBold.copyWith(
-                            color: chatThemeData.colorTheme.accentPrimary,
+                            color: chatThemeData.colorTheme.highlight,
                           ),
                         ),
                       ),
@@ -81,28 +81,11 @@ class UrlAttachment extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          Padding(
-            padding: textPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (urlAttachment.title != null)
-                  Text(
-                    urlAttachment.title!.trim(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: chatThemeData.textTheme.body
-                        .copyWith(fontWeight: FontWeight.w700),
-                  ),
-                if (urlAttachment.text != null)
-                  Text(
-                    urlAttachment.text!,
-                    style: chatThemeData.textTheme.body
-                        .copyWith(fontWeight: FontWeight.w400),
-                  ),
-              ],
-            ),
+            )
+          else
+            const SizedBox(),
+          const SizedBox(
+            height: 8,
           ),
         ],
       ),

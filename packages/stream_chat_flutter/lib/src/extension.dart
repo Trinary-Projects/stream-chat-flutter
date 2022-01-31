@@ -225,3 +225,20 @@ extension UserListX on List<User> {
     return entries.map((e) => e.key).toList(growable: false);
   }
 }
+
+/// Extension on [User] that adds color property to user.
+extension UserX on User {
+  /// Assign unique colors
+  Color get color => _colors[id.hashCode % _colors.length];
+}
+
+const List<Color> _colors = <Color>[
+  Color(0xFFF454B4),
+  Color(0xFFF2994A),
+  Color(0xFFEC407A),
+  Color(0xFF6065CB),
+  Color(0xFF63BFAC),
+  Color(0xFF60CBCB),
+  Color(0xFFBE5ACE),
+  Color(0xFFFEBE00),
+];

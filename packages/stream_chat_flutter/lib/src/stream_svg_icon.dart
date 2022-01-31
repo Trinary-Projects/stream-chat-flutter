@@ -973,6 +973,30 @@ class StreamSvgIcon extends StatelessWidget {
         height: size,
       );
 
+  /// [StreamSvgIcon] type
+  factory StreamSvgIcon.warning({
+    double? size,
+    Color? color,
+  }) =>
+      StreamSvgIcon(
+        assetName: 'warning.svg',
+        color: color,
+        width: size,
+        height: size,
+      );
+
+  /// [StreamSvgIcon] type
+  factory StreamSvgIcon.enqueued({
+    double? size,
+    Color? color,
+  }) =>
+      StreamSvgIcon(
+        assetName: 'enqueued.svg',
+        color: color,
+        width: size,
+        height: size,
+      );
+
   /// Name of icon asset
   final String? assetName;
 

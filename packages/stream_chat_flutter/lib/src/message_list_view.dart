@@ -1062,13 +1062,25 @@ class _MessageListViewState extends State<MessageListView> {
     final userId = StreamChat.of(context).currentUser!.id;
     final isMyMessage = message.user?.id == userId;
     final nextMessage = index - 1 >= 0 ? messages[index - 1] : null;
+    final lastMessage =
+        index + 1 < messages.length ? messages[index + 1] : null;
     final isNextUserSame =
         nextMessage != null && message.user!.id == nextMessage.user!.id;
+    final isLastUserSame =
+        lastMessage != null && message.user!.id == lastMessage.user!.id;
 
     num timeDiff = 0;
     if (nextMessage != null) {
       timeDiff = Jiffy(nextMessage.createdAt.toLocal()).diff(
         message.createdAt.toLocal(),
+        Units.MINUTE,
+      );
+    }
+
+    num lastTimeDiff = 0;
+    if (lastMessage != null) {
+      lastTimeDiff = Jiffy(message.createdAt.toLocal()).diff(
+        lastMessage.createdAt.toLocal(),
         Units.MINUTE,
       );
     }
@@ -1090,7 +1102,7 @@ class _MessageListViewState extends State<MessageListView> {
     final showUsername = !isMyMessage &&
         (!isThreadMessage || _isThreadConversation) &&
         !hasReplies &&
-        (timeDiff >= 1 || !isNextUserSame);
+        (lastTimeDiff >= 1 || !isLastUserSame);
 
     final showUserAvatar = isMyMessage
         ? DisplayWidget.gone

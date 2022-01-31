@@ -579,7 +579,8 @@ class _MessageWidgetState extends State<MessageWidget>
   bool get isGiphy =>
       widget.message.attachments.any((element) => element.type == 'giphy');
 
-  bool get isOnlyEmoji => widget.message.text?.isOnlyEmoji == true;
+  // bool get isOnlyEmoji => widget.message.text?.isOnlyEmoji == true;
+  bool get isOnlyEmoji => false;
 
   bool get hasNonUrlAttachments => widget.message.attachments
       .where((it) => it.titleLink == null || it.type == 'giphy')
@@ -588,13 +589,13 @@ class _MessageWidgetState extends State<MessageWidget>
   bool get hasUrlAttachments => widget.message.attachments
       .any((it) => it.titleLink != null && it.type != 'giphy');
 
-  bool get showBottomRow =>
-      showThreadReplyIndicator ||
-      showUsername ||
-      showTimeStamp ||
-      showInChannel ||
-      showSendingIndicator ||
-      isDeleted;
+  bool get showBottomRow => false;
+  // showThreadReplyIndicator ||
+  // showUsername ||
+  // showTimeStamp ||
+  // showInChannel ||
+  // showSendingIndicator ||
+  // isDeleted;
 
   @override
   bool get wantKeepAlive => widget.message.attachments.isNotEmpty;
@@ -621,6 +622,7 @@ class _MessageWidgetState extends State<MessageWidget>
           : null,
       child: Portal(
         child: InkWell(
+          splashColor: Colors.transparent,
           onTap: () {
             widget.onMessageTap!(widget.message);
           },
@@ -769,16 +771,41 @@ class _MessageWidgetState extends State<MessageWidget>
                                                   color: _getBackgroundColor(),
                                                   child: Column(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: <Widget>[
+                                                      if (showUsername)
+                                                        _buildUsername(
+                                                          const Key(
+                                                            'username',
+                                                          ),
+                                                        )
+                                                      else
+                                                        const SizedBox(
+                                                          height: 4,
+                                                        ),
                                                       if (hasQuotedMessage)
                                                         _buildQuotedMessage(),
-                                                      if (hasNonUrlAttachments)
-                                                        _parseAttachments(),
-                                                      if (!isGiphy)
-                                                        _buildTextBubble(),
+                                                      Wrap(
+                                                        alignment:
+                                                            WrapAlignment.end,
+                                                        crossAxisAlignment:
+                                                            WrapCrossAlignment
+                                                                .end,
+                                                        runAlignment:
+                                                            WrapAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          if (hasNonUrlAttachments)
+                                                            _parseAttachments(),
+                                                          if (!isGiphy)
+                                                            _buildTextBubble(),
+                                                          if (showTimeStamp)
+                                                            _buildBottomRow(),
+                                                        ],
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -996,12 +1023,17 @@ class _MessageWidgetState extends State<MessageWidget>
     if (widget.usernameBuilder != null) {
       return widget.usernameBuilder!(context, widget.message);
     }
-    return Text(
-      widget.message.user?.name ?? '',
-      maxLines: 1,
-      key: usernameKey,
-      style: widget.messageTheme.messageAuthorStyle,
-      overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: Text(
+        widget.message.user?.name ?? '',
+        maxLines: 1,
+        key: usernameKey,
+        style: widget.messageTheme.messageAuthorStyle!.copyWith(
+          color: widget.message.user?.color,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
@@ -1335,6 +1367,71 @@ class _MessageWidgetState extends State<MessageWidget>
         if (hasUrlAttachments && !hasQuotedMessage) _buildUrlAttachment(),
       ],
     );
+  }
+
+  Widget _buildBottomRow() {
+    final Widget _timeStamp = Text(
+      Jiffy(widget.message.createdAt.toLocal()).jm,
+      style: widget.messageTheme.createdAtStyle,
+      textAlign: TextAlign.end,
+    );
+    if (widget.message.extraData['status'] == null || !widget.reverse) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(4, 4, 8, 8),
+        child: _timeStamp,
+      );
+    } else {
+      late final Widget _statusIndicator;
+      switch (widget.message.extraData['status']) {
+        case 'enqueued':
+          _statusIndicator = StreamSvgIcon.enqueued(
+            size: 16,
+            color: Colors.white,
+          );
+          break;
+        case 'sent':
+          _statusIndicator = StreamSvgIcon.check(
+            size: 16,
+            color: Colors.white,
+          );
+          break;
+        case 'delivered':
+          _statusIndicator = StreamSvgIcon.checkAll(
+            size: 16,
+            color: Colors.white,
+          );
+          break;
+        case 'read':
+          _statusIndicator = StreamSvgIcon.checkAll(
+            size: 16,
+            color: const Color(0xFF00FF04),
+          );
+          break;
+        case 'failed':
+          _statusIndicator = StreamSvgIcon.warning(
+            size: 16,
+          );
+          break;
+        default:
+          print(widget.message.extraData['status']);
+          _statusIndicator = StreamSvgIcon.warning(
+            size: 16,
+          );
+      }
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(4, 2, 8, 4),
+        child: SizedBox(
+          width: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _timeStamp,
+              _statusIndicator,
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildPinnedMessage(Message message) {
