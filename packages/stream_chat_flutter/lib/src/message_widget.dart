@@ -1024,7 +1024,7 @@ class _MessageWidgetState extends State<MessageWidget>
       return widget.usernameBuilder!(context, widget.message);
     }
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      padding: const EdgeInsets.fromLTRB(12, 8, 8, 6),
       child: Text(
         widget.message.user?.name ?? '',
         maxLines: 1,
@@ -1385,7 +1385,7 @@ class _MessageWidgetState extends State<MessageWidget>
       switch (widget.message.extraData['status']) {
         case 'enqueued':
           _statusIndicator = StreamSvgIcon.enqueued(
-            size: 16,
+            size: 12,
             color: Colors.white,
           );
           break;

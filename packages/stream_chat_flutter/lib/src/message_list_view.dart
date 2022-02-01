@@ -1093,7 +1093,7 @@ class _MessageListViewState extends State<MessageListView> {
 
     final hasReplies = message.replyCount! > 0;
 
-    final attachmentBorderRadius = hasFileAttachment ? 12.0 : 14.0;
+    final attachmentBorderRadius = hasFileAttachment ? 8.0 : 14.0;
 
     final showTimeStamp = (!isThreadMessage || _isThreadConversation) &&
         !hasReplies &&

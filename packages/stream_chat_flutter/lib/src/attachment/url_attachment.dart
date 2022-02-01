@@ -73,7 +73,7 @@ class UrlAttachment extends StatelessWidget {
                         child: Text(
                           hostDisplayName,
                           style: chatThemeData.textTheme.bodyBold.copyWith(
-                            color: chatThemeData.colorTheme.highlight,
+                            color: messageTheme.messageLinksStyle?.color,
                           ),
                         ),
                       ),
