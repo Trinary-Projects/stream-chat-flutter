@@ -51,7 +51,6 @@ flutter:
     - svgs/
     - lib/svgs/
     - animations/
-    - assets/images/
   uses-material-design: true
 
 dev_dependencies:

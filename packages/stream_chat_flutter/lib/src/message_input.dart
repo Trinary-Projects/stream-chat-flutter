@@ -219,7 +219,6 @@ class MessageInput extends StatefulWidget {
     this.menuButton,
     this.textFieldBackgroundColor,
     this.messageInputPadding = const EdgeInsets.fromLTRB(16, 8, 8, 0),
-    this.sendMessage,
     this.shouldKeepFocusAfterMessage,
     this.onAttachmentTap,
     this.maxLength,
@@ -355,9 +354,6 @@ class MessageInput extends StatefulWidget {
 
   /// Padding around `TextField` input.
   final EdgeInsets messageInputPadding;
-
-  /// Called upon click of send button.
-  final Function()? sendMessage;
 
   /// Defines if the [MessageInput] loses focuses after a message is sent.
   /// The default behaviour keeps focus until a command is enabled.
@@ -648,7 +644,7 @@ class MessageInputState extends State<MessageInput> {
     } else {
       sendButton = widget.activeSendButton != null
           ? InkWell(
-              onTap: widget.sendMessage ?? sendMessage,
+              onTap: sendMessage,
               child: widget.activeSendButton,
             )
           : _buildSendButton(context);
@@ -752,8 +748,7 @@ class MessageInputState extends State<MessageInput> {
                     key: const Key('messageInputText'),
                     enabled: _inputEnabled,
                     maxLines: null,
-                    onSubmitted: (_) =>
-                        widget.sendMessage?.call() ?? sendMessage(),
+                    onSubmitted: (_) => sendMessage(),
                     keyboardType: widget.keyboardType,
                     controller: textEditingController,
                     focusNode: _focusNode,
@@ -1835,7 +1830,7 @@ class MessageInputState extends State<MessageInput> {
   Widget _buildSendButton(BuildContext context) => Padding(
         padding: const EdgeInsets.all(8),
         child: IconButton(
-          onPressed: widget.sendMessage ?? sendMessage,
+          onPressed: sendMessage,
           padding: const EdgeInsets.all(0),
           splashRadius: 24,
           constraints: const BoxConstraints.tightFor(

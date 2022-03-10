@@ -501,7 +501,7 @@ class _MessageListViewState extends State<MessageListView> {
                     _bottomPaginationActive = true;
                     return _paginateData(
                       streamChannel,
-                      QueryDirection.top,
+                      QueryDirection.bottom,
                     );
                   }
                 },
