@@ -617,7 +617,7 @@ class _MessageListViewState extends State<MessageListView> {
                     final spacingRules = <SpacingType>[];
 
                     final isNextUserSame =
-                        message.user!.id == nextMessage.user?.id;
+                        message.user?.id == nextMessage.user?.id;
                     final isThread = message.replyCount! > 0;
                     final isDeleted = message.isDeleted;
                     final hasTimeDiff = timeDiff >= 1;
@@ -1065,9 +1065,9 @@ class _MessageListViewState extends State<MessageListView> {
     final lastMessage =
         index + 1 < messages.length ? messages[index + 1] : null;
     final isNextUserSame =
-        nextMessage != null && message.user!.id == nextMessage.user!.id;
+        nextMessage != null && message.user?.id == nextMessage.user?.id;
     final isLastUserSame =
-        lastMessage != null && message.user!.id == lastMessage.user!.id;
+        lastMessage != null && message.user?.id == lastMessage.user?.id;
 
     num timeDiff = 0;
     if (nextMessage != null) {
