@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:stream_chat_flutter/src/utils.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 /// Widget to display URL attachment
@@ -15,6 +14,7 @@ class UrlAttachment extends StatelessWidget {
       horizontal: 16,
       vertical: 8,
     ),
+    this.onLinkTap,
   }) : super(key: key);
 
   /// Attachment to be displayed
@@ -29,13 +29,20 @@ class UrlAttachment extends StatelessWidget {
   /// [MessageThemeData] for showing image title
   final MessageThemeData messageTheme;
 
+  /// The function called when tapping on a link
+  final void Function(String)? onLinkTap;
+
   @override
   Widget build(BuildContext context) {
     final chatThemeData = StreamChatTheme.of(context);
     return GestureDetector(
       onTap: () {
         final titleLink = urlAttachment.titleLink;
-        if (titleLink != null) launchURL(context, titleLink);
+        if (titleLink != null) {
+          onLinkTap != null
+              ? onLinkTap!(titleLink)
+              : launchURL(context, titleLink);
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

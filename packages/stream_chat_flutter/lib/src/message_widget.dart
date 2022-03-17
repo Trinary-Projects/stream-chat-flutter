@@ -1,21 +1,13 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_portal/flutter_portal.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:stream_chat_flutter/src/attachment/url_attachment.dart';
 import 'package:stream_chat_flutter/src/extension.dart';
 import 'package:stream_chat_flutter/src/image_group.dart';
-import 'package:stream_chat_flutter/src/message_action.dart';
 import 'package:stream_chat_flutter/src/message_actions_modal.dart';
 import 'package:stream_chat_flutter/src/message_reactions_modal.dart';
 import 'package:stream_chat_flutter/src/quoted_message_widget.dart';
 import 'package:stream_chat_flutter/src/reaction_bubble.dart';
-import 'package:stream_chat_flutter/src/theme/themes.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 /// Widget builder for building attachments
@@ -859,8 +851,8 @@ class _MessageWidgetState extends State<MessageWidget>
                         ),
                       if (isFailedState)
                         Positioned(
-                          left: widget.reverse ? 0 : null,
-                          right: widget.reverse ? null : 0,
+                          right: widget.reverse ? 0 : null,
+                          left: widget.reverse ? null : 0,
                           bottom: showBottomRow ? 18 : -2,
                           child: StreamSvgIcon.error(size: 20),
                         ),
@@ -1053,6 +1045,7 @@ class _MessageWidgetState extends State<MessageWidget>
       hostDisplayName: hostDisplayName,
       textPadding: widget.textPadding,
       messageTheme: widget.messageTheme,
+      onLinkTap: widget.onLinkTap,
     );
   }
 
