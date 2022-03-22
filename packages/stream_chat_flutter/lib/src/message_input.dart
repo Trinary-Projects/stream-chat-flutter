@@ -123,7 +123,7 @@ const _kDefaultMaxAttachmentSize = 20971520; // 20MB in Bytes
 
 const _kDefaultMaxImageAttachmentSize = 5242880; // 5MB in Bytes
 const _kDefaultMaxVideoAttachmentSize = 16777216; // 16MB in Bytes
-const _kDefaultMaxFileAttachmentSize = 104857600; // 100MB in Bytes
+const _kDefaultMaxFileAttachmentSize = 20971520; // 100MB in Bytes
 
 /// Inactive state
 ///
