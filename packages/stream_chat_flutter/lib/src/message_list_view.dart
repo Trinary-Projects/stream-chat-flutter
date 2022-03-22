@@ -104,7 +104,7 @@ class MessageDetails {
     isLastUser = index + 1 < messages.length &&
         message.user?.id == messages[index + 1].user?.id;
     isNextUser =
-        index - 1 >= 0 && message.user!.id == messages[index - 1].user?.id;
+        index - 1 >= 0 && message.user?.id == messages[index - 1].user?.id;
   }
 
   /// True if the message belongs to the current user
