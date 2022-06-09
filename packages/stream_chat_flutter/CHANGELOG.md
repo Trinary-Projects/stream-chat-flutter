@@ -1,3 +1,80 @@
+## 4.2.0
+
+🐞 Fixed
+
+- [[#1133]](https://github.com/GetStream/stream-chat-flutter/issues/1133) Visibility override flags not being passed to `StreamMessageActionsModal`
+
+## 4.1.0
+
+✅ Added
+
+- [[#1119]](https://github.com/GetStream/stream-chat-flutter/issues/1119) Added an option to disable mentions overlay in `StreamMessageInput`
+- Deprecated `disableEmojiSuggestionsOverlay` in favor of `enableEmojiSuggestionsOverlay` in `StreamMessageInput`
+
+🐞 Fixed
+
+- Fixed attachment picker ui.
+- Fixed StreamChannelHeader and StreamThreadHeader subtitle alignment.
+- Fixed message widget thread indicator in reverse mode.
+- [[#1044]](https://github.com/GetStream/stream-chat-flutter/issues/1044): Refactor StreamMessageWidget bottom row to use Text.rich.
+
+🔄 Changed
+
+- Removed `isOwner` condition from `ChannelBottomSheet` and `StreamChannelInfoBottomSheet` for delete option tile.
+
+## 4.0.1
+
+- Minor fixes
+- Updated `stream_chat_flutter_core` dependency to [`4.0.1`](https://pub.dev/packages/stream_chat_flutter_core/changelog).
+
+## 4.0.0
+
+For upgrading to V4, please refer to the [V4 Migration Guide](https://getstream.io/chat/docs/sdk/flutter/guides/migration_guide_4_0/)
+
+✅ Added
+
+- [[#1087]](https://github.com/GetStream/stream-chat-flutter/issues/1087): Handle limited access to camera on iOS.
+- `centerTitle` and `elevation` properties to `ChannelHeader`, `ThreadHeader` and `ChannelListHeader`.
+
+🐞 Fixed
+
+- [[#1067]](https://github.com/GetStream/stream-chat-flutter/issues/1067): Fix name text overflow in reaction card.
+- [[#842]](https://github.com/GetStream/stream-chat-flutter/issues/842): show date divider for first message.
+- Loosen up url check for attachment download.
+- Use `ogScrapeUrl` for LinkAttachments.
+
+## 4.0.0-beta.2
+
+✅ Added
+
+- Added support to pass `autoCorrect` to `StreamMessageInput` for the text input field
+- Added support to control the visibility of the default emoji suggestions overlay in `StreamMessageInput`
+- Added support to build custom widget for scrollToBottom in `StreamMessageListView`
+
+🐞 Fixed
+
+- Minor fixes and improvements
+-[[#892]](https://github.com/GetStream/stream-chat-flutter/issues/892): Fix default `initialAlignment` in `MessageListView`.
+- Fix `MessageInputTheme.inputBackgroundColor` color not being used in some widgets of `MessageInput`
+- Removed dependency on `visibility_detector`
+- [[#1071]](https://github.com/GetStream/stream-chat-flutter/issues/1071): Fixed the way attachment actions were handled in full screen
+
+## 4.0.0-beta.1
+
+✅ Added
+
+- Deprecated old widgets in favor of Stream-prefixed ones.
+- Use channel capabilities to show/hide actions.
+- Deprecated `ChannelListView` in favor of `StreamChannelListView`.
+- Deprecated `ChannelPreview` in favor of `StreamChannelListTile`.
+- Deprecated `ChannelAvatar` in favor of `StreamChannelAvatar`.
+- Deprecated `ChannelName` in favor of `StreamChannelName`.
+- Deprecated `MessageInput` in favor of `StreamMessageInput`.
+- Separated `MessageInput` widget in smaller components. (For example `CountDownButton`, `StreamAttachmentPicker`...)
+- Updated `stream_chat_flutter_core` dependency to [`4.0.0-beta.0`](https://pub.dev/packages/stream_chat_flutter_core/changelog).
+- Added OpenGraph preview support for links in `StreamMessageInput`.
+- Removed video compression.
+
 ## 3.6.1
 
 - Updated `stream_chat_flutter_core` dependency to [`3.6.1`](https://pub.dev/packages/stream_chat_flutter_core/changelog).
@@ -6,11 +83,17 @@
 
 🐞 Fixed
 
+- Minor fixes and improvements
 -[[#892]](https://github.com/GetStream/stream-chat-flutter/issues/892): Fix default `initialAlignment` in `MessageListView`.
 - Fix `MessageInputTheme.inputBackgroundColor` color not being used in some widgets of `MessageInput`
 - Removed dependency on `visibility_detector`
 
 ## 3.5.1
+
+🛑️ Breaking Changes
+
+- `pinPermissions` is no longer needed in `MessageListView`.
+- `MessageInput` now works with a `MessageInputController` instead of a `TextEditingController`
 
 🐞 Fixed
 
@@ -44,7 +127,12 @@
 
 ✅ Added
 
-- Videos can now be auto-played in `FullScreenMedia`, by setting the `autoplayVideos` argument to true.
+- Videos can now be auto-played in `FullScreenMedia`
+- Extra customisation options for `MessageInput`
+
+🔄 Changed
+
+- Add `didUpdateWidget` override in `MessageInput` widget to handle changes to `focusNode`.
 
 ## 3.3.2
 

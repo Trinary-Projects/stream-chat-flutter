@@ -1,3 +1,79 @@
+## 4.2.0
+
+✅ Added
+
+- Added `PaginationParams.createdAtAfterOrEqual` for message pagination.
+- Added `PaginationParams.createdAtAfter` for message pagination.
+- Added `PaginationParams.createdAtBeforeOrEqual` for message pagination.
+- Added `PaginationParams.createdAtBefore` for message pagination.
+- Added `PaginationParams.createdAtAround` for message pagination.
+- Added support for `channel.disabled`, `channel.hidden` and `channel.truncatedAt` in `Channel`.
+- Added support for `channel.membership` and `channel.membershipStream` in `Channel`.
+- `Channel` now listens for `member.updated` events and updates the `Channel.members` accordingly.
+
+🔄 Changed
+
+- Deprecated `PaginationParams.before` and `PaginationParams.after`. Use `PaginationParams.limit` instead.
+
+🐞 Fixed
+
+- [[#1147]](https://github.com/GetStream/stream-chat-flutter/issues/1147) `channel.unset` not updating the extra data
+  stream.
+
+## 4.1.0
+
+✅ Added
+
+- Added support for extra data in attachment file uploader. Thanks, [@rlee1990](https://github.com/rlee1990).
+
+🔄 Changed
+
+- Deprecated `role` in `Member` in favor of `channelRole`
+- Deprecated `currentUserRole` getter in `Channel` in favor of `currentUserChannelRole`
+
+## 4.0.1
+
+- Minor fixes
+
+## 4.0.0
+
+For upgrading to V4, please refer to
+the [V4 Migration Guide](https://getstream.io/chat/docs/sdk/flutter/guides/migration_guide_4_0/)
+
+✅ Added
+
+- Added `push_provider_name` to `addDevice` API call
+
+## 4.0.0-beta.2
+
+🐞 Fixed
+
+- Fixed reactions not working for threads in offline mode.
+- [[#1046]](https://github.com/GetStream/stream-chat-flutter/issues/1046) After `/mute` command on reload cannot access
+  any channel.
+- [[#1047]](https://github.com/GetStream/stream-chat-flutter/issues/1047) `own_capabilities` extraData missing after
+  channel update.
+- [[#1054]](https://github.com/GetStream/stream-chat-flutter/issues/1054)
+  Fix `Unsupported operation: Cannot remove from an unmodifiable list`.
+- [[#1033]](https://github.com/GetStream/stream-chat-flutter/issues/1033) Hard delete from dashboard does not delete
+  message from client.
+- Send only `user_id` while reconnecting.
+
+✅ Added
+
+- Handle `event.message` in `channel.truncate` events
+- Added additional parameters to `channel.truncate`
+
+## 4.0.0-beta.0
+
+✅ Added
+
+- Added support for ownCapabilities.
+
+🐞 Fixed
+
+- Minor fixes and improvements.
+
 ## 3.6.1
 
 🐞 Fixed
@@ -13,8 +89,10 @@
   any channel.
 - [[#1047]](https://github.com/GetStream/stream-chat-flutter/issues/1047) `own_capabilities` extraData missing after
   channel update.
-- [[#1054]](https://github.com/GetStream/stream-chat-flutter/issues/1054) Fix `Unsupported operation: Cannot remove from an unmodifiable list`.
-- [[#1033]](https://github.com/GetStream/stream-chat-flutter/issues/1033) Hard delete from dashboard does not delete message from client.
+- [[#1054]](https://github.com/GetStream/stream-chat-flutter/issues/1054)
+  Fix `Unsupported operation: Cannot remove from an unmodifiable list`.
+- [[#1033]](https://github.com/GetStream/stream-chat-flutter/issues/1033) Hard delete from dashboard does not delete
+  message from client.
 - Send only `user_id` while reconnecting.
 
 ✅ Added
