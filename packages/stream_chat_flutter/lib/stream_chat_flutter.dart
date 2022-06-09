@@ -52,7 +52,7 @@ export 'src/utils.dart';
 // v4
 export 'src/v4/message_input/countdown_button.dart';
 export 'src/v4/message_input/stream_attachment_picker.dart';
-export 'src/v4/message_input/stream_message_input.dart';
+export 'src/v4/message_input/stream_message_input.dart' hide ActionsLocation;
 export 'src/v4/message_input/stream_message_send_button.dart';
 export 'src/v4/message_input/stream_message_text_field.dart';
 export 'src/v4/scroll_view/channel_scroll_view/stream_channel_grid_tile.dart';
