@@ -23,8 +23,7 @@ export 'src/localization/stream_chat_localizations.dart';
 export 'src/localization/translations.dart' show DefaultTranslations;
 export 'src/message_action.dart';
 // ignore: deprecated_member_use_from_same_package
-export 'src/message_input.dart'
-    show MessageInput, MessageInputState, ActionsLocation;
+export 'src/message_input.dart' show MessageInput, MessageInputState;
 export 'src/message_list_view.dart';
 export 'src/message_search_item.dart';
 export 'src/message_search_list_view.dart';
@@ -53,7 +52,7 @@ export 'src/utils.dart';
 // v4
 export 'src/v4/message_input/countdown_button.dart';
 export 'src/v4/message_input/stream_attachment_picker.dart';
-export 'src/v4/message_input/stream_message_input.dart' hide ActionsLocation;
+export 'src/v4/message_input/stream_message_input.dart';
 export 'src/v4/message_input/stream_message_send_button.dart';
 export 'src/v4/message_input/stream_message_text_field.dart';
 export 'src/v4/scroll_view/channel_scroll_view/stream_channel_grid_tile.dart';

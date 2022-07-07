@@ -90,6 +90,13 @@ typedef AttachmentsPickerBuilder = Widget Function(
   StreamAttachmentPicker defaultPicker,
 );
 
+/// Callback called when attachment widget is tapped.
+typedef AttachmentTapCallback = void Function(
+  String? filePath,
+  String? assetUrl,
+  String? fileType,
+);
+
 /// Location for actions on the [StreamMessageInput].
 enum ActionsLocation {
   /// Align to left
@@ -129,6 +136,10 @@ enum SendButtonLocation {
 const _kMinMediaPickerSize = 360.0;
 
 const _kDefaultMaxAttachmentSize = 20971520; // 20MB in Bytes
+
+const _kDefaultMaxImageAttachmentSize = 5242880; // 5MB in Bytes
+const _kDefaultMaxVideoAttachmentSize = 16777216; // 16MB in Bytes
+const _kDefaultMaxFileAttachmentSize = 20971520; // 100MB in Bytes
 
 /// Inactive state:
 ///
@@ -214,6 +225,9 @@ class StreamMessageInput extends StatefulWidget {
         this.disableEmojiSuggestionsOverlay = false,
     this.enableEmojiSuggestionsOverlay = true,
     this.enableMentionsOverlay = true,
+    this.maxLength = 4096,
+    this.onAttachmentTap,
+    this.menuButton,
   });
 
   /// List of options for showing overlays.
@@ -347,11 +361,34 @@ class StreamMessageInput extends StatefulWidget {
   /// Enabled by default
   final bool enableMentionsOverlay;
 
+  /// The maximum number of characters (Unicode scalar values)
+  /// to allow in the text field.
+  final int maxLength;
+
+  /// Callback called when attachment widget is tapped
+  final AttachmentTapCallback? onAttachmentTap;
+
+  /// Menu Button to be shown on left of TextInput
+  final Widget? menuButton;
+
   static bool _defaultValidator(Message message) =>
       message.text?.isNotEmpty == true || message.attachments.isNotEmpty;
 
   @override
   StreamMessageInputState createState() => StreamMessageInputState();
+
+  /// Use this method to get the current [StreamChatState] instance
+  static StreamMessageInputState of(BuildContext context) {
+    StreamMessageInputState? messageInputState;
+    messageInputState =
+        context.findAncestorStateOfType<StreamMessageInputState>();
+    assert(
+      messageInputState != null,
+      'You must have a StreamMessageInput widget'
+      ' as ancestor of your widget tree',
+    );
+    return messageInputState!;
+  }
 }
 
 /// State of [StreamMessageInput]
@@ -510,7 +547,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       builder: (context, value, _) {
         Widget child = DecoratedBox(
           decoration: BoxDecoration(
-            color: _messageInputTheme.inputBackgroundColor,
+            color: Colors.white,
             boxShadow: widget.shadow == null
                 ? (_streamChatTheme.messageInputTheme.shadow == null
                     ? []
@@ -595,7 +632,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
             elevation: widget.elevation ??
                 _streamChatTheme.messageInputTheme.elevation ??
                 8,
-            color: _messageInputTheme.inputBackgroundColor,
+            color: Colors.white,
             child: child,
           );
         }
@@ -637,6 +674,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
   Flex _buildTextField(BuildContext context) => Flex(
         direction: Axis.horizontal,
         children: <Widget>[
+          if (widget.menuButton != null) widget.menuButton!,
           if (!_commandEnabled &&
               widget.actionsLocation == ActionsLocation.left)
             _buildExpandActionsButton(context),
@@ -717,7 +755,14 @@ class StreamMessageInputState extends State<StreamMessageInput>
       timeOut: _timeOut,
       isIdle: !widget.validator(_effectiveController.message),
       isEditEnabled: _isEditing,
-      idleSendButton: widget.idleSendButton,
+      idleSendButton: InkWell(
+        child: widget.idleSendButton,
+        onTap: () {
+          if (widget.idleSendButton != null) {
+            pickFile(DefaultAttachmentTypes.image, camera: true);
+          }
+        },
+      ),
       activeSendButton: widget.activeSendButton,
     );
   }
@@ -779,12 +824,9 @@ class StreamMessageInputState extends State<StreamMessageInput>
   }
 
   Expanded _buildTextInput(BuildContext context) {
-    final margin = (widget.sendButtonLocation == SendButtonLocation.inside
-            ? const EdgeInsets.only(right: 8)
-            : EdgeInsets.zero) +
-        (widget.actionsLocation != ActionsLocation.left || _commandEnabled
-            ? const EdgeInsets.only(left: 8)
-            : EdgeInsets.zero);
+    final margin = widget.sendButtonLocation == SendButtonLocation.inside
+        ? const EdgeInsets.only(right: 8)
+        : EdgeInsets.zero;
     return Expanded(
       child: Container(
         clipBehavior: Clip.hardEdge,
@@ -815,6 +857,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
                     key: const Key('messageInputText'),
                     enabled: _inputEnabled,
                     maxLines: null,
+                    maxLength: widget.maxLength,
                     onSubmitted: (_) => sendMessage(),
                     keyboardType: widget.keyboardType,
                     controller: _effectiveController,
@@ -843,6 +886,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       hintStyle: _messageInputTheme.inputTextStyle!.copyWith(
         color: _streamChatTheme.colorTheme.textLowEmphasis,
       ),
+      counterText: '',
       border: const OutlineInputBorder(
         borderSide: BorderSide(
           color: Colors.transparent,
@@ -965,7 +1009,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       _checkMentions(value, context);
       _checkEmoji(value, context);
     },
-    const Duration(milliseconds: 350),
+    Duration.zero,
     leading: true,
   );
 
@@ -1277,6 +1321,14 @@ class StreamMessageInputState extends State<StreamMessageInput>
                             padding: const EdgeInsets.all(8),
                             child: _buildRemoveButton(e),
                           ),
+                          onAttachmentTap: () {
+                            if (widget.onAttachmentTap == null) return;
+                            widget.onAttachmentTap!(
+                              e.file?.path,
+                              e.assetUrl,
+                              e.type,
+                            );
+                          },
                         ),
                       ),
                     )
@@ -1293,24 +1345,34 @@ class StreamMessageInputState extends State<StreamMessageInput>
                 scrollDirection: Axis.horizontal,
                 children: remainingAttachments
                     .map<Widget>(
-                      (attachment) => ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Stack(
-                          children: <Widget>[
-                            AspectRatio(
-                              aspectRatio: 1,
-                              child: SizedBox(
-                                height: 104,
-                                width: 104,
-                                child: _buildAttachment(attachment),
+                      (attachment) => GestureDetector(
+                        onTap: () {
+                          if (widget.onAttachmentTap == null) return;
+                          widget.onAttachmentTap!(
+                            attachment.file?.path,
+                            attachment.assetUrl,
+                            attachment.type,
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            children: <Widget>[
+                              AspectRatio(
+                                aspectRatio: 1,
+                                child: SizedBox(
+                                  height: 104,
+                                  width: 104,
+                                  child: _buildAttachment(attachment),
+                                ),
                               ),
-                            ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: _buildRemoveButton(attachment),
-                            ),
-                          ],
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: _buildRemoveButton(attachment),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -1473,6 +1535,13 @@ class StreamMessageInputState extends State<StreamMessageInput>
         defaultButton;
   }
 
+  /// Close the attachment modal.
+  void closeAttachmentModal() {
+    setState(() {
+      _openFilePickerSection = false;
+    });
+  }
+
   /// Show the attachment modal, making the user choose where to
   /// pick a media from
   void showAttachmentModal() {
@@ -1629,7 +1698,20 @@ class StreamMessageInputState extends State<StreamMessageInput>
       extraData: extraDataMap,
     );
 
-    if (file.size! > widget.maxAttachmentSize) {
+    var _maxAttachmentSize = _kDefaultMaxAttachmentSize;
+    switch (fileType) {
+      case DefaultAttachmentTypes.video:
+        _maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;
+        break;
+      case DefaultAttachmentTypes.image:
+        _maxAttachmentSize = _kDefaultMaxImageAttachmentSize;
+        break;
+      case DefaultAttachmentTypes.file:
+        _maxAttachmentSize = _kDefaultMaxFileAttachmentSize;
+        break;
+    }
+
+    if (file.size! > _maxAttachmentSize) {
       return _showErrorAlert(
         context.translations.fileTooLargeError(
           widget.maxAttachmentSize / (1024 * 1024),
