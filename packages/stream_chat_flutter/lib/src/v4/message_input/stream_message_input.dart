@@ -1704,7 +1704,7 @@ class StreamMessageInputState extends State<StreamMessageInput>
       extraData: extraDataMap,
     );
 
-    var _maxAttachmentSize = _kDefaultMaxAttachmentSize;
+    var _maxAttachmentSize = kDefaultMaxAttachmentSize;
     switch (fileType) {
       case DefaultAttachmentTypes.video:
         _maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;

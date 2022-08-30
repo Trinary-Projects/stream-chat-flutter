@@ -215,7 +215,7 @@ class MessageInput extends StatefulWidget {
     this.shouldKeepFocusAfterMessage,
     this.onAttachmentTap,
     this.maxLength,
-  })  : assert(
+  }) : assert(
           initialMessage == null || editMessage == null,
           "Can't provide both `initialMessage` and `editMessage`",
         );
@@ -1190,7 +1190,7 @@ class MessageInputState extends State<MessageInput> {
       bytes: mediaFile.readAsBytesSync(),
     );
 
-    var maxAttachmentSize = _kDefaultMaxAttachmentSize;
+    var maxAttachmentSize = kDefaultMaxAttachmentSize;
     switch (medium.type) {
       case AssetType.audio:
         maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;
@@ -1764,7 +1764,7 @@ class MessageInputState extends State<MessageInput> {
       extraData: extraDataMap,
     );
 
-    var maxAttachmentSize = _kDefaultMaxAttachmentSize;
+    var maxAttachmentSize = kDefaultMaxAttachmentSize;
     switch (attachmentType) {
       case 'video':
         maxAttachmentSize = _kDefaultMaxVideoAttachmentSize;
@@ -1777,7 +1777,6 @@ class MessageInputState extends State<MessageInput> {
         break;
     }
 
-    
     if (file.size! > maxAttachmentSize) {
       return _showErrorAlert(
         context.translations.fileTooLargeError(
