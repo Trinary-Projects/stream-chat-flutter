@@ -135,7 +135,8 @@ enum SendButtonLocation {
 
 const _kMinMediaPickerSize = 360.0;
 
-const _kDefaultMaxAttachmentSize = 20971520; // 20MB in Bytes
+/// Default maximum size for media attachments.
+const kDefaultMaxAttachmentSize = 1024 * 1024 * 100; // 100MB in Bytes
 
 const _kDefaultMaxImageAttachmentSize = 5242880; // 5MB in Bytes
 const _kDefaultMaxVideoAttachmentSize = 16777216; // 16MB in Bytes
@@ -204,7 +205,7 @@ class StreamMessageInput extends StatefulWidget {
     this.activeSendButton,
     this.showCommandsButton = true,
     this.userMentionsTileBuilder,
-    this.maxAttachmentSize = _kDefaultMaxAttachmentSize,
+    this.maxAttachmentSize = kDefaultMaxAttachmentSize,
     this.onError,
     this.attachmentLimit = 10,
     this.onAttachmentLimitExceed,
@@ -988,12 +989,14 @@ class StreamMessageInputState extends State<StreamMessageInput>
       value = value.trim();
 
       final channel = StreamChannel.of(context).channel;
-      if (channel.ownCapabilities.contains(PermissionType.sendTypingEvents) &&
-          value.isNotEmpty) {
-        channel
-            .keyStroke(_effectiveController.value.parentId)
-            // ignore: no-empty-block
-            .catchError((e) {});
+      if (value.isNotEmpty &&
+          channel.ownCapabilities.contains(PermissionType.sendTypingEvents)) {
+        // Notify the server that the user started typing.
+        channel.keyStroke(_effectiveController.message.parentId).onError(
+          (error, stackTrace) {
+            widget.onError?.call(error!, stackTrace);
+          },
+        );
       }
 
       var actionsLength = widget.actions.length;

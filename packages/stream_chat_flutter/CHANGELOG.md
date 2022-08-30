@@ -1,3 +1,69 @@
+## 4.5.0
+
+- Updated `stream_chat_flutter_core` dependency
+  to [`4.5.0`](https://pub.dev/packages/stream_chat_flutter_core/changelog).
+
+🐞 Fixed
+
+- [[#882]](https://github.com/GetStream/stream-chat-flutter/issues/882) Lots of unhandled exceptions
+  when network is off or spotty.
+- Fixes an error where Stream CDN images were not being resized in the message list view.
+
+🚀 Improved
+
+- Automatically resize images that are above a specific pixel count to ensure resizing works:
+  getstream.io/chat/docs/go-golang/file_uploads/#image-resizing
+
+✅ Added
+
+- Added `thumbnailSize`, `thumbnailResizeType`, and `thumbnailCropType` params
+  to `StreamMessageWidget` to customize the appearance of image attachment thumbnails.
+
+  ```dart
+  StreamMessageListView(
+    messageBuilder: (context, details, messages, defaultMessage) {
+      return defaultMessage.copyWith(
+        imageAttachmentThumbnailSize: ...,
+        imageAttachmentThumbnailCropType: ...,
+        imageAttachmentThumbnailResizeType: ...,
+      );
+    },
+  ),
+  ```
+
+- Added `thumbnailSize`, `thumbnailFormat`, `thumbnailQuality` and `thumbnailScale` params
+  to `StreamAttachmentPicker` to customize the appearance of image attachment thumbnails.
+
+  ```dart
+  StreamMessageInput(
+    focusNode: _focusNode,
+    messageInputController: _messageInputController,
+    attachmentsPickerBuilder: (_, __, picker) {
+      return picker.copyWith(
+        attachmentThumbnailSize: ...,
+        attachmentThumbnailFormat: ...,
+        attachmentThumbnailQuality: ...,
+        attachmentThumbnailScale: ...,
+      );
+    },
+  ),
+  ```
+
+## 4.4.1
+
+🐞 Fixed
+
+- [[#1247]](https://github.com/GetStream/stream-chat-flutter/issues/1247) Fix Jiffy initialization.
+- [[#1232]](https://github.com/getstream/stream-chat-flutter/issues/1232) Fix DateDivider not
+  showing up in the chat.
+- [[#1240]](https://github.com/getstream/stream-chat-flutter/issues/1240) Substitute mentioned user
+  ids with user names in system message.
+- [[#1228]](https://github.com/GetStream/stream-chat-flutter/issues/1228) Fix image download on iOS.
+
+🔄 Changed
+
+- Changed default maximum attachment size from 20MB to 100MB.
+
 ## 4.4.0
 
 🐞 Fixed
